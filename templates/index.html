@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title_suffix %} — Daily Check-in{% endblock %}
+
+{% block content %}
+
+{% if not baseline %}
+<!-- ── NO BASELINE: Onboarding CTA ───────────────────────────────────────── -->
+<div class="card fade-in" style="margin-top: 1rem; text-align: center; padding: 2.5rem 2rem;">
+  <div style="font-size: 2.5rem; margin-bottom: 1rem;">🌱</div>
+  <h1 class="serif" style="font-size: 1.5rem; color: var(--deep); margin-bottom: 0.75rem;">Welcome to SilentGuardian</h1>
+  <p style="color: var(--bark); line-height: 1.7; margin-bottom: 1.75rem; font-size: 0.95rem;">
+    We start by collecting five short voice-of-the-day responses to build a personal baseline —
+    a quiet reference point for the language patterns that are normal for your loved one.
+  </p>
+  <a href="/onboarding" class="btn-primary" style="text-decoration: none; display: inline-block;">
+    Begin Setup &rarr;
+  </a>
+</div>
+
+{% elif today_done %}
+<!-- ── ALREADY CHECKED IN TODAY ───────────────────────────────────────────── -->
+<div style="margin-top: 1rem;">
+  <div class="card fade-in" style="text-align: center; padding: 2rem;">
+    <div style="font-size: 2rem; margin-bottom: 0.75rem;">✅</div>
+    <h2 class="serif" style="color: var(--deep); margin-bottom: 0.5rem;">Check-in complete for today</h2>
+    <p style="color: var(--bark); font-size: 0.9rem; margin-bottom: 1.5rem;">Come back tomorrow for the next check-in.</p>
+    <a href="/history" class="btn-secondary" style="text-decoration: none;">View history</a>
+  </div>
+
+  <!-- Show last entry analysis if available -->
+  {% if history %}
+  {% set last = history[-1] %}
+  <div class="card fade-in" style="margin-top: 1.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <span class="serif" style="color: var(--deep); font-weight: 600;">Today's insights</span>
+      <span class="badge badge-{{ last.analysis.caution_level }}">{{ last.analysis.caution_level }}</span>
+    </div>
+    <p style="color: var(--ink); line-height: 1.7; font-size: 0.93rem; margin-bottom: 0.75rem;">{{ last.analysis.summary }}</p>
+    {% if last.analysis.next_step %}
+    <div style="background: var(--amber-light); border-radius: 10px; padding: 0.85rem 1rem; font-size: 0.87rem; color: var(--deep);">
+      <strong>Suggested next step:</strong> {{ last.analysis.next_step }}
+    </div>
+    {% endif %}
+    <p style="margin-top: 0.85rem; font-size: 0.78rem; color: var(--bark); font-style: italic;">{{ last.analysis.safety_note }}</p>
+  </div>
+  {% endif %}
+</div>
+
+{% else %}
+<!-- ── DAILY CHECK-IN FORM ────────────────────────────────────────────────── -->
+<div style="margin-top: 1rem;">
+  <h1 class="serif" style="font-size: 1.4rem; color: var(--deep); margin-bottom: 0.35rem;">Today's check-in</h1>
+  <p style="color: var(--bark); font-size: 0.88rem; margin-bottom: 1.25rem;">
+    {{ ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].index(now|default("Mon"))] if false else "" }}
+    Read the prompt aloud to your loved one and type their response below.
+  </p>
+
+  <!-- Prompt card -->
+  <div class="card" style="background: var(--amber-light); border-color: #E8C98A; margin-bottom: 1.25rem; display: flex; gap: 1rem; align-items: flex-start;">
+    <div style="font-size: 1.3rem; padding-top: 0.1rem;">💬</div>
+    <div>
+      <div style="font-size: 0.72rem; color: var(--bark); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; margin-bottom: 0.4rem;">Today's prompt</div>
+      <p class="serif" style="color: var(--deep); font-size: 1.05rem; line-height: 1.6; margin: 0;">{{ prompt }}</p>
+    </div>
+  </div>
+
+  <!-- Text input -->
+  <div class="card" style="padding: 1.25rem;">
+    <label style="display: block; font-size: 0.78rem; color: var(--bark); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; margin-bottom: 0.6rem;">
+      Their response
+    </label>
+    <textarea id="response-text" rows="6" placeholder="Type what they said here, as close to verbatim as possible…"></textarea>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+      <span id="word-count" style="font-size: 0.8rem; color: var(--bark);">0 words</span>
+      <button class="btn-primary" id="analyze-btn" onclick="submitAnalysis()">
+        Analyze response
+      </button>
+    </div>
+  </div>
+
+  <!-- Result area -->
+  <div id="result-area" style="margin-top: 1.25rem; display: none;"></div>
+
+  <!-- Error area -->
+  <div id="error-area" style="margin-top: 1rem; display: none;"></div>
+</div>
+{% endif %}
+
+<!-- Recent history strip -->
+{% if history and not today_done %}
+<div style="margin-top: 2rem;">
+  <div style="font-size: 0.75rem; color: var(--bark); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 0.75rem; font-weight: 500;">Recent entries</div>
+  <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+    {% for entry in history %}
+    <div class="card" style="padding: 0.9rem 1.1rem; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.8rem; color: var(--bark);">{{ entry.date[:10] }}</div>
+        <div style="font-size: 0.88rem; color: var(--deep); margin-top: 0.1rem;">{{ entry.analysis.summary[:60] }}…</div>
+      </div>
+      <span class="badge badge-{{ entry.analysis.caution_level }}">{{ entry.analysis.caution_level }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+const textarea = document.getElementById('response-text');
+const wordCountEl = document.getElementById('word-count');
+
+if (textarea) {
+  textarea.addEventListener('input', () => {
+    const words = textarea.value.trim().split(/\s+/).filter(w => w).length;
+    wordCountEl.textContent = words + ' word' + (words !== 1 ? 's' : '');
+    wordCountEl.style.color = words < 10 ? '#B5524A' : '#8C7355';
+  });
+}
+
+async function submitAnalysis() {
+  const text = textarea.value.trim();
+  const words = text.split(/\s+/).filter(w => w).length;
+  if (words < 10) {
+    showError('Please enter at least 10 words before analyzing.');
+    return;
+  }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.innerHTML = '<span class="spinner"></span> Analyzing…';
+  btn.disabled = true;
+
+  document.getElementById('result-area').style.display = 'none';
+  document.getElementById('error-area').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError(data.error || 'Something went wrong. Please try again.');
+      return;
+    }
+
+    renderResult(data);
+  } catch (e) {
+    showError('Could not connect to server. Is Flask running?');
+  } finally {
+    btn.innerHTML = 'Analyze response';
+    btn.disabled = false;
+  }
+}
+
+function renderResult(data) {
+  const a = data.analysis;
+  const levelColors = {
+    low:      { bg: '#EDF2ED', fg: '#5A7A5A', label: '🟢 Low',      border: '#C5D9C5' },
+    moderate: { bg: '#FBF2E6', fg: '#C47B2B', label: '🟡 Moderate', border: '#E8C98A' },
+    watch:    { bg: '#FCF0EF', fg: '#B5524A', label: '🔴 Watch',    border: '#E8C0BC' },
+  };
+  const col = levelColors[a.caution_level] || levelColors.low;
+
+  // Render triggered flags
+  const flagsHtml = (data.flags && data.flags.length > 0)
+    ? data.flags.map(f => `<li style="margin-bottom:0.3rem;">${f}</li>`).join('')
+    : '<li>No significant deviations from baseline detected.</li>';
+
+  const area = document.getElementById('result-area');
+  area.innerHTML = `
+    <!-- Score banner -->
+    <div style="background:${col.bg}; border:1.5px solid ${col.border}; border-radius:14px; padding:1rem 1.25rem; margin-bottom:0.9rem; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:0.72rem; color:${col.fg}; letter-spacing:0.06em; text-transform:uppercase; font-weight:600; margin-bottom:0.2rem;">Caution level</div>
+        <div class="serif" style="font-size:1.25rem; color:${col.fg}; font-weight:600;">${col.label}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.7rem; color:${col.fg}; margin-bottom:0.2rem;">Signal score</div>
+        <div style="font-size:1.6rem; font-weight:700; color:${col.fg};">${data.score}</div>
+      </div>
+    </div>
+
+    <div class="card fade-in">
+      <p style="color:var(--ink); line-height:1.75; font-size:0.95rem; margin-bottom:1rem;">${a.summary}</p>
+
+      <!-- Triggered flags -->
+      <div style="background:var(--cream); border-radius:10px; padding:0.85rem 1rem; margin-bottom:0.75rem;">
+        <div style="font-size:0.72rem; color:var(--bark); letter-spacing:0.05em; text-transform:uppercase; font-weight:500; margin-bottom:0.5rem;">Detected signals</div>
+        <ul style="margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--deep); line-height:1.7;">${flagsHtml}</ul>
+      </div>
+
+      <div style="display:grid; gap:0.75rem; margin-bottom:1rem;">
+        <div style="background:var(--cream); border-radius:10px; padding:0.85rem 1rem;">
+          <div style="font-size:0.72rem; color:var(--bark); letter-spacing:0.05em; text-transform:uppercase; font-weight:500; margin-bottom:0.3rem;">What changed</div>
+          <p style="font-size:0.9rem; color:var(--deep); margin:0; line-height:1.6;">${a.what_changed}</p>
+        </div>
+        <div style="background:var(--cream); border-radius:10px; padding:0.85rem 1rem;">
+          <div style="font-size:0.72rem; color:var(--bark); letter-spacing:0.05em; text-transform:uppercase; font-weight:500; margin-bottom:0.3rem;">Why it matters</div>
+          <p style="font-size:0.9rem; color:var(--deep); margin:0; line-height:1.6;">${a.why_it_matters}</p>
+        </div>
+      </div>
+
+      <div style="background:var(--amber-light); border-radius:10px; padding:0.9rem 1rem; margin-bottom:1rem;">
+        <div style="font-size:0.72rem; color:var(--bark); letter-spacing:0.05em; text-transform:uppercase; font-weight:500; margin-bottom:0.3rem;">Suggested next step</div>
+        <p style="font-size:0.9rem; color:var(--deep); margin:0; line-height:1.6;">${a.next_step}</p>
+      </div>
+
+      <div style="border-top:1px solid var(--stone); padding-top:0.85rem; display:flex; flex-direction:column; gap:0.4rem;">
+        <p style="font-size:0.8rem; color:var(--bark); font-style:italic; margin:0;">${a.single_day_note}</p>
+        <p style="font-size:0.78rem; color:var(--bark); margin:0;">${a.safety_note}</p>
+      </div>
+    </div>
+
+    <!-- Signals grid -->
+    <div class="card fade-in" style="margin-top:0.9rem; padding:1rem 1.25rem;">
+      <div style="font-size:0.72rem; color:var(--bark); letter-spacing:0.06em; text-transform:uppercase; font-weight:500; margin-bottom:0.85rem;">Language signals</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+        ${signalPill('Words', data.signals.word_count, data.deltas.word_count_delta + '%')}
+        ${signalPill('Vocabulary variety', data.signals.unique_word_ratio, formatDelta(data.deltas.unique_ratio_delta))}
+        ${signalPill('Words / sentence', data.signals.avg_words_per_sentence, formatDelta(data.deltas.sentence_length_delta))}
+        ${signalPill('Hesitation markers', data.signals.pause_markers, data.deltas.pause_delta !== undefined ? (data.deltas.pause_delta >= 0 ? '+' : '') + data.deltas.pause_delta : '')}
+        ${signalPill('Filler words', data.signals.filler_words, data.deltas.filler_delta !== undefined ? (data.deltas.filler_delta >= 0 ? '+' : '') + data.deltas.filler_delta : '')}
+        ${signalPill('Fragmentation', (data.signals.sentence_fragmentation * 100).toFixed(0) + '%', formatDelta((data.deltas.fragmentation_delta * 100).toFixed(1)) + '%')}
+      </div>
+      ${data.signals.repeated_phrases && data.signals.repeated_phrases.length > 0
+        ? `<div style="margin-top:0.75rem; padding:0.7rem 0.9rem; background:var(--cream); border-radius:8px; font-size:0.82rem; color:var(--deep);">
+             <span style="color:var(--bark); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:500;">Repeated phrases: </span>
+             ${data.signals.repeated_phrases.map(p => `<span style="background:var(--stone); border-radius:4px; padding:0.1rem 0.4rem; margin:0.15rem; display:inline-block;">${p}</span>`).join('')}
+           </div>`
+        : ''}
+    </div>
+
+    <div style="margin-top:1rem; text-align:center;">
+      <a href="/history" style="font-size:0.85rem; color:var(--bark); text-decoration:none;">View full history &rarr;</a>
+    </div>
+  `;
+  area.style.display = 'block';
+  area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function signalPill(label, value, delta) {
+  const isNeg = typeof delta === 'string' && delta.startsWith('-');
+  const deltaColor = isNeg ? '#B5524A' : '#5A7A5A';
+  return `<div style="background: var(--cream); border-radius: 8px; padding: 0.7rem 0.85rem;">
+    <div style="font-size: 0.7rem; color: var(--bark); margin-bottom: 0.2rem;">${label}</div>
+    <div style="font-size: 1.05rem; font-weight: 500; color: var(--deep);">${value}</div>
+    ${delta ? `<div style="font-size: 0.72rem; color: ${deltaColor};">${delta} vs baseline</div>` : ''}
+  </div>`;
+}
+
+function formatDelta(val) {
+  if (val === undefined || val === null) return '';
+  const n = parseFloat(val);
+  return (n >= 0 ? '+' : '') + n;
+}
+
+function showError(msg) {
+  const area = document.getElementById('error-area');
+  area.innerHTML = `<div class="card" style="border-color: #E8C0BC; background: var(--rose-light); color: var(--rose); font-size: 0.9rem; padding: 0.9rem 1.1rem;">${msg}</div>`;
+  area.style.display = 'block';
+}
+</script>
+{% endblock %}

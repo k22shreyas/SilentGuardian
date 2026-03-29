@@ -3,22 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>SilentGuardian</title>
+  <title>SilentGuardian{% block title_suffix %}{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Georgia, serif; background: #F7F5F0; }
-    .sans { font-family: system-ui, sans-serif; }
+    :root {
+      --cream: #F8F5EE;
+      --warm-white: #FEFCF8;
+      --stone: #E8E2D6;
+      --bark: #8C7355;
+      --deep: #3D2E1E;
+      --moss: #5A7A5A;
+      --moss-light: #EDF2ED;
+      --amber: #C47B2B;
+      --amber-light: #FBF2E6;
+      --rose: #B5524A;
+      --rose-light: #FCF0EF;
+      --ink: #2C2018;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    h1,h2,h3,.serif { font-family: 'Lora', Georgia, serif; }
+
+    .card {
+      background: var(--warm-white);
+      border: 1px solid var(--stone);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .btn-primary {
+      background: var(--deep);
+      color: var(--warm-white);
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem 1.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn-primary:hover { background: var(--bark); transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--bark);
+      border: 1.5px solid var(--stone);
+      border-radius: 10px;
+      padding: 0.65rem 1.25rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--bark); }
+
+    .badge-low    { background: var(--moss-light); color: var(--moss); }
+    .badge-moderate{ background: var(--amber-light); color: var(--amber); }
+    .badge-watch  { background: var(--rose-light); color: var(--rose); }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      text-transform: capitalize;
+    }
+
+    .disclaimer {
+      background: var(--deep);
+      color: #BFB8AD;
+      font-size: 0.72rem;
+      text-align: center;
+      padding: 0.55rem 1rem;
+      letter-spacing: 0.02em;
+    }
+    .disclaimer strong { color: #F8F5EE; }
+
+    textarea {
+      width: 100%;
+      border: 1.5px solid var(--stone);
+      border-radius: 12px;
+      padding: 1rem;
+      font-family: 'Lora', serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      background: var(--warm-white);
+      color: var(--ink);
+      resize: none;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    textarea:focus { border-color: var(--bark); }
+
+    .nav-link {
+      font-size: 0.85rem;
+      color: var(--bark);
+      text-decoration: none;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .nav-link:hover { background: var(--stone); }
+
+    /* Loading spinner */
+    .spinner {
+      width: 22px; height: 22px;
+      border: 2.5px solid var(--stone);
+      border-top-color: var(--bark);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }
   </style>
 </head>
-<body class="min-h-screen">
-  <!-- Disclaimer banner — always visible -->
-  <div class="bg-stone-800 text-stone-300 text-xs text-center py-2 px-4">
-    <strong class="text-white">Not a medical tool.</strong>
-    SilentGuardian tracks language patterns only and does not diagnose any condition.
+<body>
+  <div class="disclaimer">
+    <strong>Not a medical tool.</strong>&nbsp; SilentGuardian tracks language patterns only and does not diagnose any condition.
   </div>
 
-  <div class="max-w-lg mx-auto px-4 py-6 pb-24">
+  <!-- Top nav -->
+  <nav style="background: var(--warm-white); border-bottom: 1px solid var(--stone);">
+    <div style="max-width: 600px; margin: 0 auto; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+      <a href="/" style="font-family: 'Lora', serif; font-size: 1.05rem; color: var(--deep); text-decoration: none; font-weight: 600;">
+        🌿 SilentGuardian
+      </a>
+      <div style="display: flex; gap: 0.25rem;">
+        <a href="/" class="nav-link">Today</a>
+        <a href="/history" class="nav-link">History</a>
+      </div>
+    </div>
+  </nav>
+
+  <main style="max-width: 600px; margin: 0 auto; padding: 1.5rem 1rem 5rem;">
     {% block content %}{% endblock %}
-  </div>
+  </main>
 </body>
 </html>

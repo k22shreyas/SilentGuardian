@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title_suffix %} — History{% endblock %}
+
+{% block content %}
+<div style="margin-top: 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <div>
+      <h1 class="serif" style="font-size: 1.4rem; color: var(--deep); margin-bottom: 0.2rem;">Check-in history</h1>
+      <p style="color: var(--bark); font-size: 0.85rem;">{{ history|length }} entr{{ 'y' if history|length == 1 else 'ies' }} recorded</p>
+    </div>
+    {% if history %}
+    <button class="btn-secondary" onclick="confirmReset()" style="font-size: 0.8rem;">Reset all data</button>
+    {% endif %}
+  </div>
+
+  {% if not history %}
+  <div class="card fade-in" style="text-align: center; padding: 3rem 2rem;">
+    <div style="font-size: 2.5rem; margin-bottom: 1rem;">📋</div>
+    <h2 class="serif" style="color: var(--deep); margin-bottom: 0.5rem;">No entries yet</h2>
+    <p style="color: var(--bark); font-size: 0.9rem; margin-bottom: 1.5rem;">Complete your first daily check-in to see history here.</p>
+    <a href="/" class="btn-primary" style="text-decoration: none;">Go to today's check-in</a>
+  </div>
+
+  {% else %}
+
+  <!-- Summary strip -->
+  {% set caution_counts = {'low': 0, 'moderate': 0, 'watch': 0} %}
+  {% for entry in history %}
+    {% set _ = caution_counts.update({entry.analysis.caution_level: caution_counts.get(entry.analysis.caution_level, 0) + 1}) %}
+  {% endfor %}
+
+  <div class="card fade-in" style="padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; text-align: center;">
+    <div>
+      <div style="font-size: 1.4rem; font-weight: 600; color: #5A7A5A;">{{ caution_counts.get('low', 0) }}</div>
+      <div style="font-size: 0.75rem; color: var(--bark);">Low</div>
+    </div>
+    <div>
+      <div style="font-size: 1.4rem; font-weight: 600; color: #C47B2B;">{{ caution_counts.get('moderate', 0) }}</div>
+      <div style="font-size: 0.75rem; color: var(--bark);">Moderate</div>
+    </div>
+    <div>
+      <div style="font-size: 1.4rem; font-weight: 600; color: #B5524A;">{{ caution_counts.get('watch', 0) }}</div>
+      <div style="font-size: 0.75rem; color: var(--bark);">Watch</div>
+    </div>
+  </div>
+
+  <!-- Entry list -->
+  <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+  {% for entry in history %}
+  <div class="card fade-in" style="padding: 0;">
+    <!-- Header -->
+    <button onclick="toggleEntry('entry-{{ entry.id }}')"
+      style="width: 100%; background: none; border: none; cursor: pointer; padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+      <div>
+        <div style="font-size: 0.78rem; color: var(--bark); margin-bottom: 0.15rem;">{{ entry.date[:10] }}</div>
+        <div class="serif" style="color: var(--deep); font-size: 0.95rem; line-height: 1.4;">
+          {{ entry.analysis.summary[:70] }}{% if entry.analysis.summary|length > 70 %}…{% endif %}
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0;">
+        <span class="badge badge-{{ entry.analysis.caution_level }}">{{ entry.analysis.caution_level }}</span>
+        <span style="color: var(--bark); font-size: 1rem;">▾</span>
+      </div>
+    </button>
+
+    <!-- Expanded detail -->
+    <div id="entry-{{ entry.id }}" style="display: none; border-top: 1px solid var(--stone); padding: 1rem 1.25rem;">
+
+      <!-- Signals row -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+        <div style="background: var(--cream); border-radius: 8px; padding: 0.6rem 0.75rem;">
+          <div style="font-size: 0.68rem; color: var(--bark); margin-bottom: 0.15rem;">Words</div>
+          <div style="font-size: 1rem; font-weight: 500; color: var(--deep);">{{ entry.signals.word_count }}</div>
+          <div style="font-size: 0.7rem; color: {% if entry.deltas.word_count_delta < -15 %}#B5524A{% else %}#5A7A5A{% endif %};">
+            {% if entry.deltas.word_count_delta >= 0 %}+{% endif %}{{ entry.deltas.word_count_delta }}%
+          </div>
+        </div>
+        <div style="background: var(--cream); border-radius: 8px; padding: 0.6rem 0.75rem;">
+          <div style="font-size: 0.68rem; color: var(--bark); margin-bottom: 0.15rem;">Vocabulary</div>
+          <div style="font-size: 1rem; font-weight: 500; color: var(--deep);">{{ entry.signals.unique_word_ratio }}</div>
+          <div style="font-size: 0.7rem; color: {% if entry.deltas.unique_ratio_delta < -0.1 %}#B5524A{% else %}#5A7A5A{% endif %};">
+            {% if entry.deltas.unique_ratio_delta >= 0 %}+{% endif %}{{ entry.deltas.unique_ratio_delta }}
+          </div>
+        </div>
+        <div style="background: var(--cream); border-radius: 8px; padding: 0.6rem 0.75rem;">
+          <div style="font-size: 0.68rem; color: var(--bark); margin-bottom: 0.15rem;">Hesitations</div>
+          <div style="font-size: 1rem; font-weight: 500; color: var(--deep);">{{ entry.signals.pause_markers }}</div>
+        </div>
+      </div>
+
+      <!-- Analysis text -->
+      <div style="display: grid; gap: 0.65rem; margin-bottom: 1rem;">
+        <div>
+          <div style="font-size: 0.7rem; color: var(--bark); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; margin-bottom: 0.25rem;">What changed</div>
+          <p style="font-size: 0.88rem; color: var(--deep); line-height: 1.6; margin: 0;">{{ entry.analysis.what_changed }}</p>
+        </div>
+        {% if entry.analysis.next_step %}
+        <div style="background: var(--amber-light); border-radius: 8px; padding: 0.75rem 0.9rem;">
+          <div style="font-size: 0.7rem; color: var(--bark); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; margin-bottom: 0.25rem;">Next step</div>
+          <p style="font-size: 0.88rem; color: var(--deep); line-height: 1.5; margin: 0;">{{ entry.analysis.next_step }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Original text -->
+      <details style="margin-top: 0.5rem;">
+        <summary style="font-size: 0.78rem; color: var(--bark); cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.3rem;">
+          <span>▸</span> Show original response
+        </summary>
+        <div style="margin-top: 0.6rem; padding: 0.85rem; background: var(--cream); border-radius: 8px; font-family: 'Lora', serif; font-size: 0.9rem; line-height: 1.7; color: var(--deep); font-style: italic;">
+          "{{ entry.text }}"
+        </div>
+      </details>
+
+      <p style="margin-top: 0.85rem; font-size: 0.75rem; color: var(--bark); font-style: italic;">{{ entry.analysis.safety_note }}</p>
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Reset confirm modal -->
+<div id="reset-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:50; display:none; align-items:center; justify-content:center; padding: 1rem;">
+  <div class="card" style="max-width: 360px; width: 100%; padding: 1.5rem; text-align: center;">
+    <h2 class="serif" style="color: var(--deep); margin-bottom: 0.5rem;">Reset all data?</h2>
+    <p style="color: var(--bark); font-size: 0.9rem; margin-bottom: 1.25rem; line-height: 1.6;">This will permanently delete the baseline and all history entries. You'll need to redo the setup.</p>
+    <div style="display: flex; gap: 0.75rem; justify-content: center;">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" style="background: var(--rose);" onclick="doReset()">Yes, reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleEntry(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function confirmReset() {
+  document.getElementById('reset-modal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('reset-modal').style.display = 'none';
+}
+async function doReset() {
+  await fetch('/api/reset', { method: 'POST' });
+  window.location.href = '/';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{
+  "avg_word_count": 19,
+  "avg_sentence_count": 2,
+  "avg_unique_ratio": 0.885,
+  "avg_words_per_sentence": 12.16,
+  "avg_filler_ratio": 0.0,
+  "avg_content_ratio": 0.581,
+  "avg_repetition_score": 0.056,
+  "avg_pause_markers": 0.0,
+  "avg_uncertainty_markers": 0.0,
+  "avg_risk_score": 7.22,
+  "sample_count": 5
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "1774764332396",
+    "date": "2026-03-29T06:05:32.396449",
+    "text": "Honestly, I\u2019ve been enjoying the little things, even something as simple as good food feels amazing lately.",
+    "signals": {
+      "word_count": 18,
+      "sentence_count": 1,
+      "avg_words_per_sentence": 17.0,
+      "total_chars": 107,
+      "unique_word_ratio": 0.944,
+      "filler_word_ratio": 0.0,
+      "content_word_ratio": 0.667,
+      "repeated_phrases": [],
+      "phrase_repetition_score": 0.0,
+      "avg_sentence_length_variance": 0.0,
+      "incomplete_sentences": 0,
+      "question_marks": 0,
+      "exclamation_marks": 0,
+      "pause_markers": 0,
+      "uncertainty_markers": 0,
+      "negation_count": 0,
+      "past_tense_ratio": 0.0,
+      "present_tense_ratio": 1.0,
+      "risk_score": 6.0
+    },
+    "deltas": {
+      "word_count_delta": -5.3,
+      "unique_ratio_delta": 0.059,
+      "sentence_length_delta": 4.8,
+      "filler_ratio_delta": 0.0,
+      "repetition_delta": -0.056,
+      "risk_score_delta": -1.2,
+      "uncertainty_delta": 0,
+      "pause_delta": 0,
+      "caution_hint": "low"
+    },
+    "score": 6.0,
+    "flags": [],
+    "analysis": {
+      "summary": "Today's check-in shows word count at 18 (just 5% below baseline of 19) with vocabulary diversity at 0.944, which is actually slightly higher than the 0.885 baseline. Zero filler words, pause markers, and uncertainty markers indicate clear, confident expression.",
+      "what_changed": "This is the first entry, establishing baseline comparison. Notable: vocabulary diversity is +6.7% above baseline, and sentence length at 17.0 words per sentence is higher than the 12.16 baseline, reflecting a longer, flowing thought structure.",
+      "why_it_matters": "First entries help establish personal communication patterns. The clear articulation and positive emotional content ('enjoying the little things,' 'feels amazing') paired with strong vocabulary diversity provides a solid reference point for future comparisons.",
+      "caution_level": "low",
+      "override_reason": null,
+      "next_step": "Continue daily check-ins at a consistent time to build a reliable pattern baseline over the next 1-2 weeks.",
+      "safety_note": "This analysis tracks communication patterns only and is not a clinical assessment or diagnosis.",
+      "flag_for_review": false,
+      "single_day_note": "As a first entry, today's data serves as a starting point rather than a trend indicator."
+    }
+  }
+]

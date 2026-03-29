@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title_suffix %} — Setup{% endblock %}
+
+{% block content %}
+<div style="margin-top: 1rem;">
+
+  <!-- Progress bar -->
+  <div style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <span style="font-size: 0.78rem; color: var(--bark); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500;">Step {{ step }} of {{ total }}</span>
+      <span style="font-size: 0.78rem; color: var(--bark);">Baseline setup</span>
+    </div>
+    <div style="background: var(--stone); border-radius: 999px; height: 5px; overflow: hidden;">
+      <div style="background: var(--deep); height: 100%; border-radius: 999px; width: {{ (step / total * 100)|int }}%; transition: width 0.4s ease;"></div>
+    </div>
+  </div>
+
+  <h1 class="serif" style="font-size: 1.4rem; color: var(--deep); margin-bottom: 0.35rem;">Building the baseline</h1>
+  <p style="color: var(--bark); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.25rem;">
+    We need five responses to understand what's normal for your loved one. Each session should be on a different day if possible.
+  </p>
+
+  <!-- Prompt -->
+  <div class="card" style="background: var(--amber-light); border-color: #E8C98A; margin-bottom: 1.25rem; display: flex; gap: 1rem; align-items: flex-start;">
+    <div style="font-size: 1.3rem; padding-top: 0.1rem;">💬</div>
+    <div>
+      <div style="font-size: 0.72rem; color: var(--bark); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; margin-bottom: 0.4rem;">Read this aloud</div>
+      <p class="serif" style="color: var(--deep); font-size: 1.05rem; line-height: 1.6; margin: 0;">{{ prompt }}</p>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="card" style="padding: 1.25rem;">
+    <label style="display: block; font-size: 0.78rem; color: var(--bark); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; margin-bottom: 0.6rem;">
+      Response {{ step }}
+    </label>
+    <textarea id="response-text" rows="6" placeholder="Type their response here, as close to verbatim as possible…"></textarea>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+      <span id="word-count" style="font-size: 0.8rem; color: var(--bark);">0 words</span>
+      <button class="btn-primary" id="next-btn" onclick="saveAndContinue({{ collected }})">
+        {% if step < total %}Save &amp; continue{% else %}Finish setup{% endif %}
+      </button>
+    </div>
+  </div>
+
+  <div id="error-area" style="margin-top: 0.85rem; display: none;"></div>
+
+  <!-- Tip -->
+  <div class="card" style="margin-top: 1.25rem; padding: 1rem 1.25rem; background: var(--moss-light); border-color: #C5D9C5;">
+    <p style="font-size: 0.85rem; color: #3D5C3D; line-height: 1.6; margin: 0;">
+      <strong>Tip:</strong> Responses of 30–100 words work best. You can do all five sessions in one sitting or spread them over several days.
+    </p>
+  </div>
+</div>
+
+<script>
+// Texts collected so far, passed via sessionStorage between steps
+const STORAGE_KEY = 'sg_baseline_texts';
+
+function getTexts() {
+  try { return JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+function saveTexts(texts) {
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(texts));
+}
+
+const textarea = document.getElementById('response-text');
+const wordCountEl = document.getElementById('word-count');
+
+textarea.addEventListener('input', () => {
+  const words = textarea.value.trim().split(/\s+/).filter(w => w).length;
+  wordCountEl.textContent = words + ' word' + (words !== 1 ? 's' : '');
+  wordCountEl.style.color = words < 10 ? '#B5524A' : '#8C7355';
+});
+
+async function saveAndContinue(alreadyCollected) {
+  const text = textarea.value.trim();
+  const words = text.split(/\s+/).filter(w => w).length;
+  if (words < 10) {
+    showError('Please enter at least 10 words before continuing.');
+    return;
+  }
+
+  const btn = document.getElementById('next-btn');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const texts = getTexts();
+  texts.push(text);
+  saveTexts(texts);
+
+  const total = {{ total }};
+  const nextCollected = alreadyCollected + 1;
+
+  if (nextCollected >= total) {
+    // Submit baseline
+    try {
+      const res = await fetch('/api/baseline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texts })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Failed to save baseline.');
+        btn.innerHTML = 'Finish setup';
+        btn.disabled = false;
+        return;
+      }
+      sessionStorage.removeItem(STORAGE_KEY);
+      window.location.href = '/';
+    } catch(e) {
+      showError('Could not reach the server. Is Flask running?');
+      btn.innerHTML = 'Finish setup';
+      btn.disabled = false;
+    }
+  } else {
+    window.location.href = `/onboarding?collected=${nextCollected}`;
+  }
+}
+
+function showError(msg) {
+  const area = document.getElementById('error-area');
+  area.innerHTML = `<div class="card" style="border-color: #E8C0BC; background: var(--rose-light); color: var(--rose); font-size: 0.9rem; padding: 0.9rem 1.1rem;">${msg}</div>`;
+  area.style.display = 'block';
+}
+</script>
+{% endblock %}
