@@ -100,7 +100,7 @@ A web application for tracking emotional and cognitive patterns through daily ch
 
 ### Backend
 - **Flask**: Web framework with session management
-- **SQLite**: Local data storage with user isolation
+- **PostgreSQL**: Database storage with user isolation
 - **Anthropic Claude**: AI-powered text analysis
 - **Dataclasses**: Structured data models for signals and analysis
 
@@ -141,7 +141,7 @@ A web application for tracking emotional and cognitive patterns through daily ch
 
 ##  Privacy & Security
 
-- **Local Storage**: All data stored locally in SQLite database
+- **Database Storage**: All data stored in PostgreSQL database
 - **User Isolation**: Data completely separated between users
 - **No External Sharing**: Analysis stays on your device
 - **API Security**: Anthropic API calls are secure and temporary
