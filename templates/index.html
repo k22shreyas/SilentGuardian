@@ -165,9 +165,23 @@ function renderResult(data) {
   };
   const col = levelColors[a.caution_level] || levelColors.low;
 
+  const FLAG_DESCRIPTIONS = {
+    unique_ratio_drop_0_12: 'Vocabulary diversity dropped significantly vs baseline.',
+    repetition_spike_0_20: 'Phrase repetition increased notably vs baseline.',
+    risk_score_jump_25: 'Overall risk score jumped more than 25 points vs baseline.',
+    high_risk_score: 'Current raw risk score is high (>= 55).',
+    word_count_drop_40: 'Word count dropped by 40% or more.',
+    filler_spike_0_07: 'Filler word usage is high vs baseline.',
+    uncertainty_spike_3: 'Uncertainty markers increased significantly.',
+    pause_spike_3: 'Pause markers (hesitation) increased significantly.',
+  };
+
   // Render triggered flags
   const flagsHtml = (data.flags && data.flags.length > 0)
-    ? data.flags.map(f => `<li style="margin-bottom:0.3rem;">${f}</li>`).join('')
+    ? data.flags.map(f => {
+        const desc = FLAG_DESCRIPTIONS[f] || f;
+        return `<li style="margin-bottom:0.3rem;">${desc}</li>`;
+      }).join('')
     : '<li>No significant deviations from baseline detected.</li>';
 
   const area = document.getElementById('result-area');
