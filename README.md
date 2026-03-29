@@ -1,204 +1,229 @@
 # SilentGuardian
 
-A web application for tracking emotional and cognitive patterns through daily check-ins, powered by AI analysis. SilentGuardian helps monitor mental health indicators by analyzing language patterns in daily responses.
+**SilentGuardian** is an AI-powered web application designed for people who feel **overwhelmed, stuck, or unable to focus** — helping them understand their mental state and take **clear, immediate action**.
 
-##  Features
+🔗 **Live Demo:** https://silentguardian.onrender.com
+*(Try it instantly — no setup required)*
 
-### Clarity Tracking
-- **Daily Check-ins**: Short voice-of-the-day responses to build emotional baselines
-- **Pattern Recognition**: AI-powered analysis of language patterns, sentiment, and emotional indicators
-- **Risk Assessment**: Automatic caution level detection (Low/Moderate/Watch) based on baseline comparisons
-- **Historical Insights**: Track changes over time with detailed analysis
+---
 
-### Focus Tracking
-- **Multi-step Analysis**: 3-question focus assessments to understand current mental state
-- **Focus Mode Detection**: Identifies Flow State, Check-in, or Support needed
-- **Signal Breakdown**: Detailed metrics on task switching, avoidance, urgency, and emotional spikes
-- **Start Mode**: Actionable next steps with built-in timers and strategies
+## 🚀 Why SilentGuardian?
 
-### Key Capabilities
-- **Baseline Establishment**: 5-day onboarding to create personalized reference points
-- **Real-time Analysis**: Instant feedback on current mental state
-- **Historical Trends**: Visual tracking of patterns over time
-- **Safety-First Design**: Non-diagnostic tool with clear disclaimers
+Many people struggle with:
 
-##  Quick Start
+* Not understanding *what they’re feeling*
+* Feeling overwhelmed by too many tasks
+* Being unable to start even simple work
+
+SilentGuardian bridges that gap by turning **unclear thoughts → structured insights → actionable steps**.
+
+It doesn’t try to replace therapy — it helps users **gain clarity and move forward in the moment**.
+
+---
+
+## ✨ What It Does
+
+### 🧠 Clarity Tracking
+
+* Daily check-ins to capture your mental state
+* AI analyzes emotional tone and language patterns
+* Detects shifts from your personal baseline
+* Assigns a simple **caution level** (Low / Moderate / Watch)
+
+---
+
+### 🎯 Focus Tracking
+
+* Guided 3-step check-in to assess focus
+
+* Detects:
+
+  * Flow state
+  * Distraction / avoidance
+  * Need for support
+
+* Breaks down signals like:
+
+  * Task switching
+  * Urgency
+  * Emotional spikes
+
+---
+
+### ⚡ Start Mode (Core Feature)
+
+When you're stuck, SilentGuardian:
+
+* Reduces overwhelm
+* Gives **one small actionable step**
+* Helps you **start immediately**
+
+---
+
+## 🧩 Key Capabilities
+
+* **Personal Baselines**
+  Learns your patterns over time (5-day onboarding)
+
+* **Real-time AI Feedback**
+  Instant analysis of your current state
+
+* **Pattern Awareness**
+  See how your mental state evolves
+
+* **Action-Oriented Design**
+  Focus on *doing*, not just analyzing
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+
+* Flask
+* SQLite (local) / PostgreSQL (production-ready)
+* Anthropic Claude API
+
+### Frontend
+
+* Jinja2 Templates
+* Vanilla JavaScript
+* Responsive CSS
+
+---
+
+## ⚙️ Setup (Optional – for local development)
 
 ### Prerequisites
-- Python 3.10+
-- Anthropic API key (for AI analysis)
+
+* Python 3.10+
+* Anthropic API key
+
+---
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd SilentGuardian
-   ```
+```bash
+git clone <repository-url>
+cd SilentGuardian
+```
 
-2. **Set up virtual environment**
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+```
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-4. **Configure environment**
-   ```bash
-   cp .env.example .env  # If .env.example exists, otherwise create .env
-   ```
-   
-   Add your Anthropic API key:
-   ```
-   ANTHROPIC_API_KEY=your_api_key_here
-   SECRET_KEY=your_secret_key_here
-   ```
+---
 
-5. **Run the application**
-   ```bash
-   python app.py
-   ```
+### Environment Variables
 
-6. **Open your browser**
-   Navigate to `http://localhost:5000`
+Create a `.env` file:
 
-##  Usage Guide
+```env
+ANTHROPIC_API_KEY=your_api_key_here
+SECRET_KEY=your_secret_key_here
+```
 
-### First Time Setup
+---
 
-1. **Create Account**: Register with email and password
-2. **Clarity Onboarding**: Complete 5 daily check-ins to establish your baseline
-3. **Focus Onboarding**: Complete 5 focus assessments to establish focus patterns
+### Run
 
-### Daily Workflow
+```bash
+python app.py
+```
 
-#### Clarity Check-in
-- Navigate to the home page
-- Answer the daily prompt (rotates weekly)
-- Receive instant analysis with caution level and insights
-- View historical trends in the History tab
+Visit:
 
-#### Focus Check-in
-- Click "Focus" in the navigation
-- Answer 3 sequential questions about current focus state
-- Get comprehensive analysis including:
-  - Focus mode (Flow/Check-in/Support)
-  - Signal breakdown (task switches, avoidance, etc.)
-  - Next actionable steps
-  - Start Mode with timers and strategies
+```
+http://localhost:5000
+```
 
-### Navigation
-- **Clarity**: Daily emotional check-ins and analysis
-- **Focus**: Multi-step focus pattern assessment
-- **History**: View past analyses with filtering options
+---
 
-##  Technical Architecture
+## 🧪 How It Works
 
-### Backend
-- **Flask**: Web framework with session management
-- **PostgreSQL**: Database storage with user isolation
-- **Anthropic Claude**: AI-powered text analysis
-- **Dataclasses**: Structured data models for signals and analysis
+### 1. Input
 
-### Frontend
-- **Jinja2 Templates**: Server-side rendering
-- **Vanilla JavaScript**: Interactive UI components
-- **CSS Variables**: Consistent theming system
-- **Responsive Design**: Mobile-friendly interface
+User writes a short response about their current state
 
-### Data Processing
-- **Signal Extraction**: Linguistic pattern analysis (word count, sentiment, repetition, etc.)
-- **Baseline Comparison**: Statistical comparison against personal norms
-- **Risk Scoring**: Weighted algorithm for caution level determination
-- **Focus Analysis**: Specialized metrics for attention and productivity patterns
+### 2. Signal Processing
 
-##  Analysis Features
+The system extracts:
 
-### Clarity Signals
-- Word count and vocabulary diversity
-- Sentence structure and complexity
-- Emotional word usage (positive/negative)
-- Hesitation markers and uncertainty
-- Past vs present tense usage
+* Emotional tone
+* Language complexity
+* Behavioral indicators (avoidance, urgency, etc.)
 
-### Focus Signals
-- Task switching frequency
-- Avoidance language patterns
-- Urgency indicators
-- Emotional spike detection
-- Hyperfocus and scatter cues
-- Focus/momentum/scatter scores
+### 3. AI Analysis
 
-### AI Analysis
-- **Summary**: Concise overview of current state
-- **Insights**: Detailed explanations of patterns
-- **Recommendations**: Actionable next steps
-- **Safety Notes**: Important disclaimers and context
+Claude generates:
 
-##  Privacy & Security
+* Summary
+* Insights
+* Recommendations
 
-- **Database Storage**: All data stored in PostgreSQL database
-- **User Isolation**: Data completely separated between users
-- **No External Sharing**: Analysis stays on your device
-- **API Security**: Anthropic API calls are secure and temporary
+### 4. Output
 
-##  Important Disclaimers
+User receives:
 
-- **Not a Medical Tool**: This application is for informational purposes only
-- **Not Diagnostic**: Cannot diagnose mental health conditions
-- **Professional Advice**: Consult healthcare professionals for medical concerns
-- **Data Limitations**: Analysis based on text patterns, not clinical assessment
+* Clear understanding of their state
+* **One actionable next step**
 
-##  Development
+---
 
-### Project Structure
+## 🔒 Privacy & Ethics
+
+* Data is stored securely per user
+* No public data exposure
+* No diagnostic claims
+
+SilentGuardian is designed to:
+
+* **Support, not replace** human care
+* Encourage **real-world action**
+* Maintain **transparency about limitations**
+
+---
+
+## ⚠️ Disclaimer
+
+* Not a medical or diagnostic tool
+* For awareness and self-reflection only
+* Consult professionals for clinical concerns
+
+---
+
+## 📁 Project Structure
+
 ```
 SilentGuardian/
-├── app.py              # Main Flask application
-├── auth.py             # User authentication
-├── claude_client.py    # Anthropic API integration
-├── signals.py          # Text analysis and signal processing
-├── storage.py          # Data persistence layer
-├── templates/          # Jinja2 HTML templates
-├── data/               # User data storage
-└── requirements.txt    # Python dependencies
+├── app.py              # Main application
+├── auth.py             # User handling
+├── claude_client.py    # AI integration
+├── signals.py          # Pattern analysis
+├── storage.py          # Data layer
+├── templates/          # UI
+└── requirements.txt
 ```
 
-### Key Components
+---
 
-#### Signal Processing (`signals.py`)
-- Text analysis algorithms
-- Baseline computation and comparison
-- Risk scoring and caution levels
+## 💡 Vision
 
-#### AI Integration (`claude_client.py`)
-- Prompt engineering for different analysis types
-- Response parsing and structured output
-- Error handling and fallbacks
+SilentGuardian is built around a simple idea:
 
-#### Data Storage (`storage.py`)
-- User data isolation
-- JSON-based persistence
-- Baseline and history management
+> People don’t just need insights — they need help taking the **first step**.
 
-##  Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+## 🙌 Acknowledgments
 
-##  License
+* Powered by Anthropic Claude
+* Inspired by cognitive behavioral principles
+* Built for mental clarity and action
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-##  Acknowledgments
-
-- Built with Anthropic's Claude for AI analysis
-- Inspired by cognitive behavioral techniques
-- Designed for mental health awareness and self-monitoring
+---
